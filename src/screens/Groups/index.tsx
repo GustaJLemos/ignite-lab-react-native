@@ -1,13 +1,12 @@
+import { Header } from '@components/Header';
 import React from 'react';
 
-import { Container, Title } from './styles'
+import { Container } from './styles'
 
 export function Groups() {
   return (
     <Container>
-      <Title>
-        Opa tudo bem?
-      </Title>
+      <Header showBackButton={false}/>
     </Container>
   );
 }
