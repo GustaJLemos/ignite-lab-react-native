@@ -3,6 +3,7 @@ import { GroupCard } from '@components/GroupCard';
 import { Header } from '@components/Header';
 import { Highlight } from '@components/Highlight';
 import { ListEmpty } from '@components/ListEmpty';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
@@ -10,7 +11,13 @@ import { FlatList } from 'react-native';
 import { Container } from './styles'
 
 export function Groups() {
+  const navigation = useNavigation();
+  
   const [groups, setGroups] = useState<string[]>(['Galera da Rocketseat', 'Amigos da facul']);
+
+  function handleNewGroup() {
+    navigation.navigate('newGroupScreen')
+  }
 
   return (
     <Container>
@@ -35,7 +42,10 @@ export function Groups() {
         )}
       />
 
-      <Button title='Criar nova turma'/>
+      <Button 
+        title='Criar nova turma'
+        onPress={handleNewGroup}
+      />
     </Container>
   );
 }
