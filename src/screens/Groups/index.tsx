@@ -3,8 +3,9 @@ import { GroupCard } from '@components/GroupCard';
 import { Header } from '@components/Header';
 import { Highlight } from '@components/Highlight';
 import { ListEmpty } from '@components/ListEmpty';
-import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { groupsGetAll } from '@storage/group/groupsGetAll';
+import React, { useCallback } from 'react';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
 
@@ -18,6 +19,25 @@ export function Groups() {
   function handleNewGroup() {
     navigation.navigate('newGroupScreen')
   }
+  
+  function handleNavigateToPlayers(item: string) {
+    navigation.navigate('playersScreen', { group: item })
+  }
+
+  async function fetchGroups() {
+    try {
+      const groupsFetcheds = await groupsGetAll()
+      setGroups(groupsFetcheds)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // usamos o useCallback para evitar renderizações desnecessárias, inclusive está na doc usar o hook
+  //  com o useFocusEffect
+  useFocusEffect(useCallback(() => {
+    fetchGroups()
+  }, []))
 
   return (
     <Container>
@@ -31,7 +51,7 @@ export function Groups() {
         renderItem={({ item }) => (
           <GroupCard 
             title={item} 
-            onPress={() => console.log('cu')}
+            onPress={() => handleNavigateToPlayers(item)}
           />
         )}
         contentContainerStyle={groups.length === 0 && { flex: 1 }}
