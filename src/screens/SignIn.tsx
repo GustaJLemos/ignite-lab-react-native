@@ -4,8 +4,16 @@ import BackgroundImg from '@assets/background.png';
 import LogoSvg from '@assets/logo.svg';
 import { Input } from '@components/Input';
 import { Button } from '@components/Buttons';
+import { useNavigation } from '@react-navigation/native'
+import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
 
 export function SignIn() {
+  const navigation = useNavigation<AuthNavigatorRoutesProps>();
+
+  function handleNavigateToSignUp() {
+    navigation.navigate('signUpScreen')
+  }
+
   return (
     <ScrollView 
       contentContainerStyle={{ flexGrow: 1 }} 
@@ -13,7 +21,11 @@ export function SignIn() {
     >
       <VStack flex={1} bg='gray.700' px={10}>
         <Image 
+        // source ele pressupõe que é flexível, então ele vai levar um pouco mais de tempo pra carregar
           source={BackgroundImg}
+          // já o default, a gente fala q essa é a padrão e pronto, então ele vai carregar mais rápido
+          // então aq a gente diz, independete de qual iamgem vai vir, esse é o padrão e show, como se ela memorizasse essa imagem como padrão
+          defaultSource={BackgroundImg}
           alt='Pessoas treinando'
           resizeMode='contain'
           position='absolute'
@@ -47,7 +59,11 @@ export function SignIn() {
           <Text color='gray.100' fontSize='sm' fontFamily='body'>
             Ainda não tem acesso
           </Text>
-          <Button title='Criar conta' variant='outline'/>
+          <Button 
+            title='Criar conta' 
+            variant='outline' 
+            onPress={handleNavigateToSignUp}
+          />
         </Center>
       </VStack>
     </ScrollView>
