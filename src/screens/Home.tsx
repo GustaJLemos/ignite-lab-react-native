@@ -1,11 +1,27 @@
-import { Center, Text } from "native-base";
+import { Group } from "@components/Group";
+import { HomeHeader } from "@components/HomeHeader";
+import { HStack, VStack } from "native-base";
+import { useState } from "react";
 
 export function Home() {
+  const [groupSelected, setGroupSelected] = useState('costas');
+
   return (
-    <Center flex={1}>
-      <Text>
-        Home
-      </Text>
-    </Center>
+    <VStack flex={1}>
+      <HomeHeader />
+
+      <HStack>
+        <Group 
+          name='ombros' 
+          isActive={groupSelected === 'costas'}
+          onPress={() => setGroupSelected('costas')}
+        />
+        <Group 
+          name='costas' 
+          isActive={groupSelected === 'ombro'}
+          onPress={() => setGroupSelected('ombro')}
+        />
+      </HStack>
+    </VStack>
   );
 }
