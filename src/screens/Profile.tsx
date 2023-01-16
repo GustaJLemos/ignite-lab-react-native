@@ -5,11 +5,30 @@ import { UserPhoto } from "@components/UserPhoto";
 import { Center, Heading, ScrollView, Skeleton, Text, VStack } from "native-base";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
 
 const PHOTO_SIZE = 33
 
 export function Profile() {
   const [photoIsLoading, setPhotoIsLoading] = useState(true);
+  const [userPhoto, setUserPhoto] = useState('https://github.com/gustajlemos.png');
+
+  async function handleUserPhotoSelect() {
+    const photoSelected = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      // qualidade vai de zero a um
+      quality: 1,
+      // imagem 4 x 4 quadradinha
+      aspect: [4, 4],
+      // dá a opção por ex para o usuário editar a imagem quando seleciona
+      allowsEditing: true,
+    });
+
+    if(photoSelected.canceled) return;
+    
+    // a uri que vem nesse objeto é onde a foto está sendo salva no dispositivo do usuário
+    setUserPhoto(photoSelected.assets[0].uri)
+  }
 
   return (
     <VStack flex={1}>
@@ -27,13 +46,13 @@ export function Profile() {
           />
           ) : (
             <UserPhoto 
-              source={{ uri: 'https://github.com/gustajlemos.png' }}
+              source={{ uri: userPhoto }}
               alt='Foto do usuário'
               size={PHOTO_SIZE}
             />
           )}
           
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleUserPhotoSelect}>
             <Text color='green.500' fontWeight='bold' fontSize='md' mt={2} mb={8}>
               Aletar foto
             </Text>
