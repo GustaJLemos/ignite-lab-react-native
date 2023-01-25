@@ -6,6 +6,7 @@ import { Center, Heading, ScrollView, Skeleton, Text, VStack } from "native-base
 import { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 const PHOTO_SIZE = 33
 
@@ -28,8 +29,12 @@ export function Profile() {
 
       if(photoSelected.canceled) return;
       
+      if(photoSelected.assets[0]?.uri) {
+        const photoInfo = await FileSystem.getInfoAsync(photoSelected.assets[0]?.uri)
+
+        setUserPhoto(photoSelected.assets[0].uri)
+      }
       // a uri que vem nesse objeto é onde a foto está sendo salva no dispositivo do usuário
-      setUserPhoto(photoSelected.assets[0].uri)
     } catch {
 
     } finally {
