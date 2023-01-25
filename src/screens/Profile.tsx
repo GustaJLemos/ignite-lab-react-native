@@ -10,24 +10,32 @@ import * as ImagePicker from 'expo-image-picker';
 const PHOTO_SIZE = 33
 
 export function Profile() {
-  const [photoIsLoading, setPhotoIsLoading] = useState(true);
+  const [photoIsLoading, setPhotoIsLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState('https://github.com/gustajlemos.png');
 
   async function handleUserPhotoSelect() {
-    const photoSelected = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      // qualidade vai de zero a um
-      quality: 1,
-      // imagem 4 x 4 quadradinha
-      aspect: [4, 4],
-      // dá a opção por ex para o usuário editar a imagem quando seleciona
-      allowsEditing: true,
-    });
+    setPhotoIsLoading(true);
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        // qualidade vai de zero a um
+        quality: 1,
+        // imagem 4 x 4 quadradinha
+        aspect: [4, 4],
+        // dá a opção por ex para o usuário editar a imagem quando seleciona
+        allowsEditing: true,
+      });
 
-    if(photoSelected.canceled) return;
-    
-    // a uri que vem nesse objeto é onde a foto está sendo salva no dispositivo do usuário
-    setUserPhoto(photoSelected.assets[0].uri)
+      if(photoSelected.canceled) return;
+      
+      // a uri que vem nesse objeto é onde a foto está sendo salva no dispositivo do usuário
+      setUserPhoto(photoSelected.assets[0].uri)
+    } catch {
+
+    } finally {
+      setPhotoIsLoading(false);
+
+    }
   }
 
   return (
