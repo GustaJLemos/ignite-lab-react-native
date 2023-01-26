@@ -2,9 +2,9 @@ import { Button } from "@components/Buttons";
 import { Input } from "@components/Input";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
-import { Center, Heading, ScrollView, Skeleton, Text, VStack } from "native-base";
+import { Center, Heading, ScrollView, Skeleton, Text, useToast, VStack } from "native-base";
 import { useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 
@@ -14,10 +14,13 @@ export function Profile() {
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState('https://github.com/gustajlemos.png');
 
+  const toast = useToast();
+
   async function handleUserPhotoSelect() {
     setPhotoIsLoading(true);
     try {
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        // prop pra gente restringir que só podemos selecionar imagens
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         // qualidade vai de zero a um
         quality: 1,
@@ -32,14 +35,26 @@ export function Profile() {
       if(photoSelected.assets[0]?.uri) {
         const photoInfo = await FileSystem.getInfoAsync(photoSelected.assets[0]?.uri)
 
+        // a size da foto vem em bytes, precisamos transformar em megaBytes, e para isso, dividimos
+        if(photoInfo?.size && (photoInfo?.size / 1024 / 1024) > 3) {
+          return toast.show({
+            title: 'Essa imagem é muito grande. Escolha uma de até 3MB.',
+            placement: 'top',
+            bgColor: 'red.500'
+          }) 
+        }
+
+        // a uri que vem nesse objeto é onde a foto está sendo salva no dispositivo do usuário
         setUserPhoto(photoSelected.assets[0].uri)
       }
-      // a uri que vem nesse objeto é onde a foto está sendo salva no dispositivo do usuário
     } catch {
-
+      toast.show({
+        title: 'Não foi possível selecionar a foto.',
+        placement: 'top',
+        bgColor: 'red.500'
+      }) 
     } finally {
       setPhotoIsLoading(false);
-
     }
   }
 
