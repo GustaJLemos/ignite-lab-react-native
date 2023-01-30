@@ -5,8 +5,10 @@ import LogoSvg from '@assets/logo.svg';
 import { Input } from '@components/Input';
 import { Button } from '@components/Buttons';
 import { useNavigation } from '@react-navigation/native'
-import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookForm/resolvers/yup';
+
 
 type FormDataProps = {
   name: string;
@@ -15,8 +17,32 @@ type FormDataProps = {
   passwordConfirm: string;
 }
 
+const DEFAULT_VALUES = {
+  name: 'Gustavo',
+  email: 'gustavo@gmail.com',
+  password: '1q2w3E*',
+  passwordConfirm: '1q2w3E*'
+}
+
+const signUpSchema = yup.object({
+  name: yup.string().required('Informe o nome.'),
+  email: yup.string().required('Informe o e-mail').email('E-mail inválido.'),
+  password: yup.string().required('Informe a senha.').min(6, 'A senha deve conter pelo menos 6 caracteres.'),
+  passwordConfirm: yup.string().required('Confirme a senha.').oneOf([yup.ref('password'), null], 'As senhas não conferem.'),
+})
+
 export function SignUp() {
-  const { control, handleSubmit } = useForm<FormDataProps>();
+  const { control, handleSubmit, formState: { errors }, reset } = useForm<FormDataProps>({
+    resolver: yupResolver(signUpSchema)
+  });
+    // {
+    //   defaultValues: {
+    //     name: 'Gustavo',
+    //     email: 'gustavo@gmail.com',
+    //     password: '1q2w3E*',
+    //     passwordConfirm: '1q2w3E*'
+    //   }
+    // }
 
   const navigation = useNavigation();
 
@@ -26,6 +52,8 @@ export function SignUp() {
 
   function handleSignUp(data: FormDataProps) {
     console.log(data);
+    // resetando o valor do form
+    reset(DEFAULT_VALUES)
   }
 
   return (
@@ -57,18 +85,30 @@ export function SignUp() {
           <Controller 
             control={control}
             name='name'
+            // podemos fazer validação dessa forma, ou com o yup
+            // rules={{
+            //   required: 'Informe o nome.'
+            // }}
             render={({ field: { onChange, value } }) => (
               <Input 
                 placeholder='Nome'
                 onChangeText={onChange}   
-                value={value}         
+                value={value} 
+                errorMessage={errors.name?.message}  
               />
             )}
-          />
+          /> 
 
           <Controller 
             control={control}
             name='email'
+            // rules={{
+            //   required: 'Informe o e-mail.',
+            //   pattern: {
+            //     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            //     message: 'E-mail inválido' 
+            //   }
+            // }}
             render={({ field: { onChange, value } }) => (
               <Input 
                 placeholder='E-mail'
@@ -76,9 +116,11 @@ export function SignUp() {
                 autoCapitalize='none'
                 onChangeText={onChange}
                 value={value}         
+                errorMessage={errors.email?.message}
               />
             )}
           />
+
           <Controller 
             control={control}
             name='password'
@@ -87,7 +129,8 @@ export function SignUp() {
                 placeholder='Senha'
                 secureTextEntry
                 onChangeText={onChange}    
-                value={value}         
+                value={value}     
+                errorMessage={errors.password?.message}  
               />
             )}
           />
@@ -103,6 +146,7 @@ export function SignUp() {
                 value={value}  
                 onSubmitEditing={handleSubmit(handleSignUp)}       
                 returnKeyType='send'
+                errorMessage={errors.passwordConfirm?.message}  
               />
             )}
           />
@@ -113,7 +157,7 @@ export function SignUp() {
           title='Voltar para o login' 
           variant='outline' 
           onPress={handleNavigateToSignIn} 
-          mt={24}
+          mt={12}
         />
       </VStack>
     </ScrollView>
