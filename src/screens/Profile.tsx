@@ -96,7 +96,7 @@ export function Profile() {
             bg='gray.600'
           />
         
-          <Heading color='gray.200' fontSize='md' mb={2} mt={12} alignSelf='flex-start'>
+          <Heading color='gray.200' fontSize='md' fontFamily='heading' mb={2} mt={12} alignSelf='flex-start'>
             Alterar senha
           </Heading>
 

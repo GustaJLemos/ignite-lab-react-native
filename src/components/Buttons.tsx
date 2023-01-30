@@ -23,6 +23,7 @@ export function Button({ title, variant = 'solid', ...rest }: Props) {
         color={variant === 'outline' ? 'green.500' : 'white'} 
         fontFamily='heading' 
         fontSize='sm'
+        
       >
         {title}
       </Text>

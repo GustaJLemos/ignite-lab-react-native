@@ -24,7 +24,7 @@ export function Exercise() {
 
         <HStack justifyContent='space-between' mt={4} mb={8} alignItems='center'>
           {/* flexShrink faz com que quando o texto for muito grande ele quebre para a linha debaixo sem empurrar o icone */}
-          <Heading color='gray.100' fontSize='lg' flexShrink={1}>
+          <Heading color='gray.100' fontSize='lg' fontFamily='heading' flexShrink={1}>
             Puxada frontal
           </Heading>
 
