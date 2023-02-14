@@ -1,4 +1,4 @@
-import { VStack, Image, Text, Center, Heading, ScrollView } from 'native-base';
+import { VStack, Image, Text, Center, Heading, ScrollView, useToast } from 'native-base';
 
 import BackgroundImg from '@assets/background.png';
 import LogoSvg from '@assets/logo.svg';
@@ -7,6 +7,9 @@ import { Button } from '@components/Buttons';
 import { useNavigation } from '@react-navigation/native'
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
 import { Controller, useForm } from 'react-hook-form';
+import { useAuth } from '@hooks/useAuth';
+import { AppError } from '@utils/AppError';
+import { useState } from 'react';
 
 type FormDataProps = {
   email: string;
@@ -14,7 +17,13 @@ type FormDataProps = {
 }
 
 export function SignIn() {
+  const { signIn } = useAuth();
+
+  const toast = useToast();
+
   const { control, handleSubmit, formState: { errors }, reset } = useForm<FormDataProps>();
+
+  const [ isLoading, setIsLoading ] = useState(false);
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
@@ -22,8 +31,24 @@ export function SignIn() {
     navigation.navigate('signUpScreen')
   }
 
-  function handleSignIn({ email, password }: FormDataProps) {
-    console.log(email, password)
+  async function handleSignIn({ email, password }: FormDataProps) {
+    setIsLoading(true)
+    try {
+      await signIn(email, password)
+
+    } catch (err) {
+      const isAppError = err instanceof AppError;
+      const title = isAppError ? err.message : 'Não foi possível executar o login. Tente novamente mais tarde!'
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500'
+      })
+      // aq n precisamos desativar o loading, pq se der certo ele vai ser redirecionado
+      // para outra rota, ou seja, a stack de rotas públicas desaparece
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -99,6 +124,7 @@ export function SignIn() {
             title='Criar conta' 
             variant='outline' 
             onPress={handleNavigateToSignUp}
+            isLoading={isLoading}
           />
         </Center>
       </VStack>

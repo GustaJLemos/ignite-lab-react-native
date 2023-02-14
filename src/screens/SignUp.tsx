@@ -12,6 +12,8 @@ import { api } from '@services/api';
 import axios from 'axios';
 import { Alert } from 'react-native';
 import { AppError } from '@utils/AppError';
+import { useAuth } from '@hooks/useAuth';
+import { useState } from 'react';
 
 type FormDataProps = {
   name: string;
@@ -36,6 +38,10 @@ const signUpSchema = yup.object({
 
 export function SignUp() {
   const toast = useToast();
+
+  const { signIn } = useAuth();
+
+  const [ isLoading, setIsLoading ] = useState(false);
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm<FormDataProps>({
     resolver: yupResolver(signUpSchema)
@@ -77,17 +83,15 @@ export function SignUp() {
     // }).then((res) => console.log(res))
     // .catch((err) => console.log(err))
 
-
+    setIsLoading(true);
     try {
-      const response = await api.post('/users', {
+      await api.post('/users', {
         name, email, password
       })
   
-      console.log(response.data)
-  
-      // resetando o valor do form
-      reset(DEFAULT_VALUES)
+      await signIn(email, password)
     } catch(err) {
+      setIsLoading(false);
       // aq estamos verificando, se é um erro que veio do back end, que foi pego pelo axios, se for um erro 
       // que veio por uma lógica errada do try por ex, ele não entra nesse if
       // if(axios.isAxiosError(err)) {
@@ -201,7 +205,11 @@ export function SignUp() {
               />
             )}
           />
-          <Button title='Criar e acessar' onPress={handleSubmit(handleSignUp)}/>
+          <Button 
+            title='Criar e acessar'
+            onPress={handleSubmit(handleSignUp)} 
+            isLoading={isLoading}
+          />
         </Center>
 
         <Button 
