@@ -12,7 +12,9 @@ import { useTheme } from 'native-base';
 
 type AppRoutes = {
   homeScreen: undefined;
-  exerciseScreen: undefined;
+  exerciseScreen: {
+    exerciseId: string;
+  };
   historyScreen: undefined;
   profileScreen: undefined;
 }
