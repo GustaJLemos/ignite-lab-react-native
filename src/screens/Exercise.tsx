@@ -11,15 +11,19 @@ import { useEffect, useState } from "react";
 import { AppError } from "@utils/AppError";
 import { api } from "@services/api";
 import { ExerciseDto } from "@dtos/ExerciseDto";
+import { Loading } from "@components/Loading";
+import { AppNavigatorRoutesProps } from '@routes/app.routes';
 
 type RouteParamsProps = {
   exerciseId: string;
 }
 
 export function Exercise() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [submittingRegister, setSubmittingRegister] = useState(false);
   const [exerciseDetails, setExerciseDetails] = useState<ExerciseDto>({} as ExerciseDto);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const toast = useToast();
 
@@ -32,6 +36,7 @@ export function Exercise() {
 
   async function fetchExerciseDetailsById() {
     try {
+      setIsLoading(true);
       const response = await api.get(`/exercises/${exerciseId}`);
 
       setExerciseDetails(response.data);
@@ -44,6 +49,35 @@ export function Exercise() {
         placement: 'top',
         bgColor: 'red.500'
       })
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleExerciseHistoryRegister() {
+    try {
+      setSubmittingRegister(true);
+
+      await api.post('/history', { exercise_id: exerciseId });
+
+      toast.show({
+        title: 'Exercício registrado no seu histórico',
+        placement: 'top',
+        bgColor: 'green.700'
+      });
+
+      navigation.navigate('historyScreen');
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : 'Não foi possível registrar o exercício';
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500'
+      });
+    } finally {
+      setSubmittingRegister(false);
     }
   }
 
@@ -73,7 +107,9 @@ export function Exercise() {
         </HStack>
       </VStack>
 
-      <ScrollView>
+      {isLoading ? (
+        <Loading />
+      ) : (
         <VStack p={8}>
           {/* por ser um gif e não uma imagem, ele perde o arredondamento, por isso vamos colocar a box por fora */}
           <Box rounded='lg' mb={3} overflow='hidden'>
@@ -106,11 +142,14 @@ export function Exercise() {
 
               <Button 
                 title="Marcar como realizado"
+                onPress={handleExerciseHistoryRegister}
+                isLoading={submittingRegister}
               />
             </HStack>
           </Box>
         </VStack>
-      </ScrollView>
+      )}
+      
     </VStack>
   );
 }
