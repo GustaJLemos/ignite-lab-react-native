@@ -5,16 +5,35 @@ import { UserPhoto } from "@components/UserPhoto";
 import { Center, Heading, ScrollView, Skeleton, Text, useToast, VStack } from "native-base";
 import { useState } from "react";
 import { Alert, TouchableOpacity } from "react-native";
+import { Controller, useForm } from 'react-hook-form';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import { useAuth } from "@hooks/useAuth";
 
 const PHOTO_SIZE = 33
+
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  old_password: string;
+  confirm_password: string;
+}
 
 export function Profile() {
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState('https://github.com/gustajlemos.png');
 
+  const { user } = useAuth();
+
   const toast = useToast();
+
+  const { control } = useForm<FormDataProps>({
+    defaultValues: {
+      name: user.nome,
+      email: user.email,
+    }
+  });
 
   async function handleUserPhotoSelect() {
     setPhotoIsLoading(true);
@@ -86,15 +105,34 @@ export function Profile() {
             </Text>
           </TouchableOpacity>
 
-          <Input 
-            placeholder="Nome"
-            bg='gray.600'
+          <Controller 
+            control={control}
+            name='name'
+            render={({ field: {value, onChange} }) => (
+              <Input 
+                value={value}
+                onChangeText={onChange}
+                placeholder="Nome"
+                bg='gray.600'
+              />
+            )}
           />
-          <Input 
-            value="gustavolemosmendes@gmail.com"
-            isDisabled
-            bg='gray.600'
+
+          <Controller 
+            control={control}
+            name='email'
+            render={({ field: {value, onChange} }) => (
+              <Input 
+                value={value}
+                placeholder='E-mail'
+                onChangeText={onChange}
+                isDisabled
+                bg='gray.600'
+              />
+            )}
           />
+
+          
         
           <Heading color='gray.200' fontSize='md' fontFamily='heading' mb={2} mt={12} alignSelf='flex-start'>
             Alterar senha
