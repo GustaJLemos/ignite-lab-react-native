@@ -87,9 +87,31 @@ export function Profile() {
             bgColor: 'red.500'
           }) 
         }
-
+        
         // a uri que vem nesse objeto é onde a foto está sendo salva no dispositivo do usuário
-        setUserPhoto(photoSelected.assets[0].uri)
+        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
+
+        const photoFile = {
+          name: `${user.nome}.${fileExtension}`.toLowerCase(),
+          uri: photoSelected.assets[0].uri,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`
+        } as any;
+
+        const userPhotoUploadForm = new FormData();
+        userPhotoUploadForm.append('avatar', photoFile);
+
+        // adicionamos um novo header para deixar claro para nossa requisição oq aquele cara é
+        await api.patch('/users/avatar', userPhotoUploadForm, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        
+        toast.show({
+          title: 'Foto atualizada!',
+          placement: 'top',
+          bgColor: 'green.500'
+        }) 
       }
     } catch {
       toast.show({
