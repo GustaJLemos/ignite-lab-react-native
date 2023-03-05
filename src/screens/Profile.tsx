@@ -13,6 +13,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from "@hooks/useAuth";
 import { AppError } from "@utils/AppError";
 import { api } from "@services/api";
+import userDefaultPhoto from '@assets/userPhotoDefault.png';
 
 const PHOTO_SIZE = 33
 
@@ -46,7 +47,6 @@ const profileSchema = yup.object({
 export function Profile() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
-  const [userPhoto, setUserPhoto] = useState('https://github.com/gustajlemos.png');
 
   const { user, updateUserProfile } = useAuth();
 
@@ -101,12 +101,17 @@ export function Profile() {
         userPhotoUploadForm.append('avatar', photoFile);
 
         // adicionamos um novo header para deixar claro para nossa requisição oq aquele cara é
-        await api.patch('/users/avatar', userPhotoUploadForm, {
+        const avatarUpdatedResponse = await api.patch('/users/avatar', userPhotoUploadForm, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         })
         
+        const userUpdated = user;
+        userUpdated.avatar = avatarUpdatedResponse.data.avatar;
+
+        updateUserProfile(userUpdated);
+
         toast.show({
           title: 'Foto atualizada!',
           placement: 'top',
@@ -170,7 +175,11 @@ export function Profile() {
           />
           ) : (
             <UserPhoto 
-              source={{ uri: userPhoto }}
+              source={
+                user.avatar ? { 
+                  uri: `${api.defaults.baseURL}/avatar/${user.avatar}` 
+                } : userDefaultPhoto
+              }
               alt='Foto do usuário'
               size={PHOTO_SIZE}
             />
