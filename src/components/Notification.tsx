@@ -2,25 +2,36 @@ import { HStack, Text, IconButton, CloseIcon, Icon, Pressable } from 'native-bas
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { OSNotification } from 'react-native-onesignal';
+import * as Linking from 'expo-linking';
 
 type Props = {
   notification: OSNotification;
   onClose: () => void;
 }
 
-type AdditionalDataProps = {
-  route?: 'details';
-  product_id?: string;
-}
+// Dessa forma conseguimos passar dados adicionais vindo da notificação
+// type AdditionalDataProps = {
+//   route?: 'details';
+//   product_id?: string;
+// }
 
 export function Notification({ notification, onClose }: Props) {
-  const { navigate } = useNavigation();
+  // const { navigate } = useNavigation();
+
+  // Podemos redirecionar o nosso usuário para nossa rota e etc, atraavés dos dados adicionais
+  // mas também podemos usar o deep linking, que é a estratégia mais correta e ideal
+  // function handleOnPress() {
+  //   const { route, product_id } = notification.additionalData as AdditionalDataProps;
+
+  //   if (route === 'details' && product_id) {
+  //     navigate(route, { productId: product_id });
+  //   }
+  //   onClose();
+  // }
 
   function handleOnPress() {
-    const { route, product_id } = notification.additionalData as AdditionalDataProps;
-
-    if (route === 'details' && product_id) {
-      navigate(route, { productId: product_id });
+    if (notification?.launchURL) {
+      Linking.openURL(notification.launchURL)
     }
     onClose();
   }
