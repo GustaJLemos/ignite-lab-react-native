@@ -5,8 +5,10 @@ import { HistoryByDayDto } from "@dtos/HistoryByDayDto";
 import { useFocusEffect } from "@react-navigation/native";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
+import { getDistanceOfDates } from "@utils/Date";
 import { Heading, VStack, SectionList, Text, useToast } from "native-base";
 import { useCallback, useEffect, useState } from "react";
+import OneSignal from "react-native-onesignal";
 
 export function History() {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,6 +20,22 @@ export function History() {
     try {
       setIsLoading(true);
       const response = await api.get<HistoryByDayDto[]>('/history');
+
+      // TODO testar tudo essas parada aq
+      // ver se o titulo ou o created at
+      const distance = getDistanceOfDates(response.data[response.data.length - 1].title);
+
+      console.log('distance', distance)
+      if (distance > '1') {
+        console.log('mande a notificação para o usuário falando quanto tempo ele n faz exercícios')
+        // OneSignal.sendTag('dias_sem_exercicio', distance)
+      }
+
+      // TODO verificar se for final de semana, eu mando a notificação
+      const finalDeSemana = true;
+      if (finalDeSemana) {
+        // OneSignal.sendTag('exercicios_feitos', response.data.map((item) => item.data.length))
+      }
 
       setExercises(response.data);
     } catch (error) {
@@ -40,13 +58,13 @@ export function History() {
 
   return (
     <VStack flex={1}>
-      <ScreenHeader title='Histórico de Exercícios'/>
+      <ScreenHeader title='Histórico de Exercícios' />
       {isLoading ? <Loading /> :
-        <SectionList 
+        <SectionList
           sections={exercises}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <HistoryCard 
+            <HistoryCard
               key={item.id}
               exercise={item}
             />

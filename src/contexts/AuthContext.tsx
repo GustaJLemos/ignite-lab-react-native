@@ -3,6 +3,7 @@ import { api } from "@services/api";
 import { storageAuthTokenGet, storageAuthTokenRemove, storageAuthTokenSave } from "@storage/storageAuthToken";
 import { storageUserSave, storageUserGet, storageUserRemove } from "@storage/storageUser";
 import { createContext, useEffect, useState } from "react";
+import OneSignal from "react-native-onesignal";
 
 export type AuthContextDataProps = {
   user: UserDto;
@@ -19,7 +20,7 @@ type AuthContextProviderProps = {
 export const AuthContext = createContext<AuthContextDataProps>({} as AuthContextDataProps);
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
-  const [user, setUser] = useState<UserDto>({} as UserDto); 
+  const [user, setUser] = useState<UserDto>({} as UserDto);
 
   const [isLoadingStorageData, setIsLoadingStorageData] = useState(true);
 
@@ -38,7 +39,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       setIsLoadingStorageData(true);
 
       await storageUserSave(userData);
-      await storageAuthTokenSave({token, refresh_token});
+      await storageAuthTokenSave({ token, refresh_token });
     } catch (error) {
       throw error;
     } finally {
@@ -57,7 +58,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     try {
       const { data } = await api.post('/sessions', { email, password });
 
-      if(data.user && data.token && data.refresh_token) {
+      OneSignal.sendTag('user_logged', data.user);
+
+      if (data.user && data.token && data.refresh_token) {
 
         await storageUserAndTokenSave(data.user, data.token, data.refresh_token);
 
@@ -77,7 +80,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       await storageUserRemove();
 
       await storageAuthTokenRemove();
-      
+
     } catch (error) {
       throw error;
     } finally {
@@ -89,9 +92,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     try {
       setIsLoadingStorageData(true);
       const userLogged = await storageUserGet();
-      const {token} = await storageAuthTokenGet();
-      
-      if(token && userLogged) {
+      const { token } = await storageAuthTokenGet();
+
+      if (token && userLogged) {
         userAndTokenUpdate(userLogged, token);
       }
     } catch (error) {

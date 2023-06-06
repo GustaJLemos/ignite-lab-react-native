@@ -7,13 +7,11 @@ import { Button } from '@components/Buttons';
 import { useNavigation } from '@react-navigation/native'
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import { yupResolver } from '@hookForm/resolvers/yup';
 import { api } from '@services/api';
-import axios from 'axios';
-import { Alert } from 'react-native';
 import { AppError } from '@utils/AppError';
 import { useAuth } from '@hooks/useAuth';
 import { useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 type FormDataProps = {
   name: string;
@@ -41,19 +39,19 @@ export function SignUp() {
 
   const { signIn } = useAuth();
 
-  const [ isLoading, setIsLoading ] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm<FormDataProps>({
     resolver: yupResolver(signUpSchema)
   });
-    // {
-    //   defaultValues: {
-    //     name: 'Gustavo',
-    //     email: 'gustavo@gmail.com',
-    //     password: '1q2w3E*',
-    //     passwordConfirm: '1q2w3E*'
-    //   }
-    // }
+  // {
+  //   defaultValues: {
+  //     name: 'Gustavo',
+  //     email: 'gustavo@gmail.com',
+  //     password: '1q2w3E*',
+  //     passwordConfirm: '1q2w3E*'
+  //   }
+  // }
 
   const navigation = useNavigation();
 
@@ -88,9 +86,9 @@ export function SignUp() {
       await api.post('/users', {
         name, email, password
       })
-  
+
       await signIn(email, password)
-    } catch(err) {
+    } catch (err) {
       setIsLoading(false);
       // aq estamos verificando, se é um erro que veio do back end, que foi pego pelo axios, se for um erro 
       // que veio por uma lógica errada do try por ex, ele não entra nesse if
@@ -112,12 +110,12 @@ export function SignUp() {
   }
 
   return (
-    <ScrollView 
-      contentContainerStyle={{ flexGrow: 1 }} 
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
     >
       <VStack flex={1} bg='gray.700' px={10}>
-        <Image 
+        <Image
           source={BackgroundImg}
           defaultSource={BackgroundImg}
           alt='Pessoas treinando'
@@ -137,7 +135,7 @@ export function SignUp() {
             Crie sua conta
           </Heading>
 
-          <Controller 
+          <Controller
             control={control}
             name='name'
             // podemos fazer validação dessa forma, ou com o yup
@@ -145,16 +143,16 @@ export function SignUp() {
             //   required: 'Informe o nome.'
             // }}
             render={({ field: { onChange, value } }) => (
-              <Input 
+              <Input
                 placeholder='Nome'
-                onChangeText={onChange}   
-                value={value} 
-                errorMessage={errors.name?.message}  
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.name?.message}
               />
             )}
-          /> 
+          />
 
-          <Controller 
+          <Controller
             control={control}
             name='email'
             // rules={{
@@ -165,57 +163,57 @@ export function SignUp() {
             //   }
             // }}
             render={({ field: { onChange, value } }) => (
-              <Input 
+              <Input
                 placeholder='E-mail'
                 keyboardType='email-address'
                 autoCapitalize='none'
                 onChangeText={onChange}
-                value={value}         
+                value={value}
                 errorMessage={errors.email?.message}
               />
             )}
           />
 
-          <Controller 
+          <Controller
             control={control}
             name='password'
             render={({ field: { onChange, value } }) => (
-              <Input 
+              <Input
                 placeholder='Senha'
                 secureTextEntry
-                onChangeText={onChange}    
-                value={value}     
-                errorMessage={errors.password?.message}  
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
               />
             )}
           />
 
-          <Controller 
+          <Controller
             control={control}
             name='passwordConfirm'
             render={({ field: { onChange, value } }) => (
-              <Input 
+              <Input
                 placeholder='Confirme a senha'
                 secureTextEntry
-                onChangeText={onChange}   
-                value={value}  
-                onSubmitEditing={handleSubmit(handleSignUp)}       
+                onChangeText={onChange}
+                value={value}
+                onSubmitEditing={handleSubmit(handleSignUp)}
                 returnKeyType='send'
-                errorMessage={errors.passwordConfirm?.message}  
+                errorMessage={errors.passwordConfirm?.message}
               />
             )}
           />
-          <Button 
+          <Button
             title='Criar e acessar'
-            onPress={handleSubmit(handleSignUp)} 
+            onPress={handleSubmit(handleSignUp)}
             isLoading={isLoading}
           />
         </Center>
 
-        <Button 
-          title='Voltar para o login' 
-          variant='outline' 
-          onPress={handleNavigateToSignIn} 
+        <Button
+          title='Voltar para o login'
+          variant='outline'
+          onPress={handleNavigateToSignIn}
           mt={12}
         />
       </VStack>

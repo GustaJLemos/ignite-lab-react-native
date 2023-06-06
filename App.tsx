@@ -3,23 +3,25 @@ import { useFonts, Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/
 import { NativeBaseProvider } from 'native-base'
 import { THEME } from './src/theme';
 import { Loading } from '@components/Loading';
-import { SignIn } from '@screens/SignIn';
 import { Routes } from '@routes/index';
-import { NavigationContainer } from '@react-navigation/native';
-import { AuthContext, AuthContextProvider } from '@contexts/AuthContext';
+import { AuthContextProvider } from '@contexts/AuthContext';
+import OneSignal from 'react-native-onesignal';
+import { ONESIGNAL_APP_ID } from './env';
+
+OneSignal.setAppId(ONESIGNAL_APP_ID);
 
 export default function App() {
-  const [ fontsLoaded ] = useFonts({ Roboto_400Regular, Roboto_700Bold });
+  const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold });
 
   return (
     <NativeBaseProvider theme={THEME}>
-      <StatusBar 
+      <StatusBar
         barStyle='light-content'
         backgroundColor='transparent'
         translucent
       />
       <AuthContextProvider>
-        { fontsLoaded ? <Routes /> : <Loading />  }
+        {fontsLoaded ? <Routes /> : <Loading />}
       </AuthContextProvider>
     </NativeBaseProvider>
   );
