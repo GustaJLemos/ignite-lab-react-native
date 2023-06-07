@@ -9,6 +9,7 @@ import HomeSvg from '@assets/home.svg';
 import HistorySvg from '@assets/history.svg';
 import ProfileSvg from '@assets/profile.svg';
 import { useTheme } from 'native-base';
+import { NotFound } from '@screens/NotFound';
 
 type AppRoutes = {
   homeScreen: undefined;
@@ -17,6 +18,7 @@ type AppRoutes = {
   };
   historyScreen: undefined;
   profileScreen: undefined;
+  notFoundScreen: undefined;
 }
 
 // TODO testar essa patifaria aq
@@ -81,6 +83,11 @@ export function AppRoutes() {
             <ProfileSvg fill={color} width={iconSize} height={iconSize} />
           )
         }}
+      />
+      <Screen
+        name='notFoundScreen'
+        component={NotFound}
+        options={{ tabBarButton: () => null }}
       />
     </Navigator>
   );
