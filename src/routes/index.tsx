@@ -12,17 +12,19 @@ const linking = {
   prefixes: ['com.gusta.igniteGym://', 'igniteGym://'],
   config: {
     screens: {
-      SignUpScreen: 'signUpScreen',
-      HomeScreen: 'homeScreen',
-      ExerciseScreen: {
+      signInScreen: 'signInScreen',
+      signUpScreen: 'signUpScreen',
+      homeScreen: 'homeScreen',
+      // TODO testar
+      exerciseScreen: {
         path: 'exerciseScreen/:exerciseId',
         parse: {
           exerciseId: (exerciseId: string) => exerciseId
         }
       },
-      HistoryScreen: 'historyScreen',
-      ProfileScreen: 'profileScreen',
-      NotFoundScreen: '*'
+      historyScreen: 'historyScreen',
+      profileScreen: 'profileScreen',
+      notFoundScreen: '*'
     }
   }
 }
