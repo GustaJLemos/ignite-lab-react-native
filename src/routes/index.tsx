@@ -6,8 +6,6 @@ import { AppRoutes } from './app.routes';
 import { AuthRoutes } from './auth.routes';
 import OneSignal from 'react-native-onesignal';
 
-// TODO Deep Links tanto para o fluxo autenticado quanto o não autenticado.
-
 // TODO quando usuário está logado, n posso usar deepLinking para as telas do usuários deslogado... e vice e versa.
 const linking = {
   prefixes: ['com.gusta.igniteGym://', 'igniteGym://'],
@@ -16,7 +14,6 @@ const linking = {
       signInScreen: 'signInScreen',
       signUpScreen: 'signUpScreen',
       homeScreen: 'homeScreen',
-      // TODO testar
       exerciseScreen: {
         path: 'exerciseScreen/:exerciseId',
         parse: {
@@ -29,8 +26,6 @@ const linking = {
     }
   }
 }
-
-// TODO, preciso fazer várias validações para checar se é um cara logado e os carai... para dai levr ele para o app
 
 export function Routes() {
   const nativeBaseTheme = useTheme();
