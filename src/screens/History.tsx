@@ -5,10 +5,12 @@ import { HistoryByDayDto } from "@dtos/HistoryByDayDto";
 import { useFocusEffect } from "@react-navigation/native";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
-import { getDistanceOfDates } from "@utils/Date";
+import { getDistanceOfDates, returnDayOfWeek } from "@utils/Date";
 import { Heading, VStack, SectionList, Text, useToast } from "native-base";
 import { useCallback, useEffect, useState } from "react";
 import OneSignal from "react-native-onesignal";
+
+const WEEKEND_DAYS = ['SATURDAY', 'SUNDAY']
 
 export function History() {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,20 +23,23 @@ export function History() {
       setIsLoading(true);
       const response = await api.get<HistoryByDayDto[]>('/history');
 
-      // TODO testar tudo essas parada aq
-      // ver se o titulo ou o created at
-      const distance = getDistanceOfDates(response.data[response.data.length - 1].title);
+      if (response.data.length > 0) {
+        const lastExerciseDate = response.data[response.data.length - 1].data[0].created_at
+        const formatedToValidDate = lastExerciseDate.replace(' ', 'T')
 
-      console.log('distance', distance)
-      if (distance > '1') {
-        console.log('mande a notificação para o usuário falando quanto tempo ele n faz exercícios')
-        // OneSignal.sendTag('dias_sem_exercicio', distance)
-      }
+        if (__DEV__) console.log('Quanto tempo estou sem fazer exercícios?', getDistanceOfDates(formatedToValidDate))
+        const lastExerciseDateToString = getDistanceOfDates(formatedToValidDate)
 
-      // TODO verificar se for final de semana, eu mando a notificação
-      const finalDeSemana = true;
-      if (finalDeSemana) {
-        // OneSignal.sendTag('exercicios_feitos', response.data.map((item) => item.data.length))
+        if (lastExerciseDateToString) {
+          OneSignal.sendTag('dias_sem_exercicio', lastExerciseDateToString)
+        }
+
+        if (__DEV__) console.log('Em que dia estamos?', returnDayOfWeek())
+        const dayOfTheWeek = returnDayOfWeek()
+
+        if (WEEKEND_DAYS.includes(dayOfTheWeek.toUpperCase())) {
+          OneSignal.sendTag('exercicios_feitos', String(response.data.map(item => item.data.length)))
+        }
       }
 
       setExercises(response.data);
