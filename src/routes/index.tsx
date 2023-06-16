@@ -2,12 +2,13 @@ import { Loading } from '@components/Loading';
 import { useAuth } from '@hooks/useAuth';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native'
 import { Box, useTheme } from 'native-base';
-import { useContext } from 'react';
 import { AppRoutes } from './app.routes';
 import { AuthRoutes } from './auth.routes';
+import OneSignal from 'react-native-onesignal';
 
 // TODO Deep Links tanto para o fluxo autenticado quanto o não autenticado.
 
+// TODO quando usuário está logado, n posso usar deepLinking para as telas do usuários deslogado... e vice e versa.
 const linking = {
   prefixes: ['com.gusta.igniteGym://', 'igniteGym://'],
   config: {
@@ -38,6 +39,19 @@ export function Routes() {
   theme.colors.background = nativeBaseTheme.colors.gray[700];
 
   const { user, isLoadingStorageData } = useAuth();
+
+  // TODO terminar essas funções, e criar componente de notificação
+  OneSignal.promptForPushNotificationsWithUserResponse((notification) => {
+    console.log('promptForPushNotificationsWithUserResponse', notification)
+  })
+
+  OneSignal.setNotificationWillShowInForegroundHandler((notification) => {
+    console.log('setNotificationWillShowInForegroundHandler', notification)
+  })
+
+  OneSignal.setNotificationOpenedHandler((notification) => {
+    console.log('setNotificationOpenedHandler', notification)
+  })
 
   if (isLoadingStorageData) {
     return (
