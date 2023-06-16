@@ -89,7 +89,7 @@ export function Exercise() {
     <VStack flex={1}>
       <VStack px={8} bg='gray.600' pt={12}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Icon as={Feather} name='arrow-left' color='green.500' size={6}/>
+          <Icon as={Feather} name='arrow-left' color='green.500' size={6} />
         </TouchableOpacity>
 
         <HStack justifyContent='space-between' mt={4} mb={8} alignItems='center'>
@@ -113,7 +113,7 @@ export function Exercise() {
         <VStack p={8}>
           {/* por ser um gif e não uma imagem, ele perde o arredondamento, por isso vamos colocar a box por fora */}
           <Box rounded='lg' mb={3} overflow='hidden'>
-            <Image 
+            <Image
               w='full'
               h={80}
               source={{ uri: `${api.defaults.baseURL}/exercise/demo/${exerciseDetails.demo}` }}
@@ -125,7 +125,7 @@ export function Exercise() {
 
           {/* box === view do react native */}
           <Box color='gray.600' rounded='md' pb={4} px={4}>
-            <HStack alignItems='center' justifyContent='space-around' mb={6} mt={5}>
+            <VStack alignItems='center' justifyContent='space-around' mb={6} mt={5}>
               <HStack>
                 <SeriesSvg />
                 <Text color='gray.200' ml={2}>
@@ -140,16 +140,16 @@ export function Exercise() {
                 </Text>
               </HStack>
 
-              <Button 
+              <Button
                 title="Marcar como realizado"
                 onPress={handleExerciseHistoryRegister}
                 isLoading={submittingRegister}
               />
-            </HStack>
+            </VStack>
           </Box>
         </VStack>
       )}
-      
+
     </VStack>
   );
 }
