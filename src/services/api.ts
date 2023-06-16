@@ -14,7 +14,7 @@ type PromiseType = {
 }
 
 const api = axios.create({
-  baseURL: 'http://192.168.15.1:3333'
+  baseURL: 'localHost'
 }) as APIInstanceProps;
 
 let failedQueue: PromiseType[] = [];
@@ -23,27 +23,27 @@ let isRefreshing = false;
 api.registerInterceptTokenManager = signOut => {
   // só colocamos o interceptor na const pra gente conseguir ejetar ele
   const interceptTokenManager = api.interceptors.response.use((response) => {
-  
+
     return response;
   }, async (requestError) => {
 
-    if(requestError?.response?.status === 401) {
-      if(requestError.response.data?.message === 'token.expired' || requestError.response.data?.message === 'token.invalid') {
+    if (requestError?.response?.status === 401) {
+      if (requestError.response.data?.message === 'token.expired' || requestError.response.data?.message === 'token.invalid') {
         const { refresh_token } = await storageAuthTokenGet();
 
-        if(!refresh_token) {
+        if (!refresh_token) {
           signOut();
           return Promise.reject(requestError);
         }
 
         const originalRequestConfig = requestError.config;
 
-        if(isRefreshing) {
+        if (isRefreshing) {
           // aq vai ser onde vamos adicionar as requisições na nossa fila de espera
           return new Promise((resolve, reject) => {
             failedQueue.push({
               onSucess: (token: string) => {
-                originalRequestConfig.headers = {'Authorization': `Bearer ${token}`};
+                originalRequestConfig.headers = { 'Authorization': `Bearer ${token}` };
                 resolve(api(originalRequestConfig));
               },
               onFailure: (error: AxiosError) => {
@@ -59,14 +59,14 @@ api.registerInterceptTokenManager = signOut => {
         return new Promise(async (resolve, reject) => {
           try {
             const { data } = await api.post('/sessions/refresh-token', { refresh_token });
-            storageAuthTokenSave({ token: data.token , refresh_token: data.refresh_token });
+            storageAuthTokenSave({ token: data.token, refresh_token: data.refresh_token });
 
-            if(originalRequestConfig.data) {
+            if (originalRequestConfig.data) {
               // verificando se a requisição que deu 401 tinha algum dado junto a ela
               originalRequestConfig.data = JSON.parse(originalRequestConfig.data);
             }
 
-            originalRequestConfig.headers = {'Authorization': `Bearer ${data.token}`};
+            originalRequestConfig.headers = { 'Authorization': `Bearer ${data.token}` };
             // atualizando o token das próx requisições que vamos fazer
             api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
 
@@ -93,7 +93,7 @@ api.registerInterceptTokenManager = signOut => {
     }
 
     // se existir, quer dizer q é uma msg de erro tratada vinda do back
-    if(requestError.response && requestError.response?.data) {
+    if (requestError.response && requestError.response?.data) {
       return Promise.reject(new AppError(requestError.response?.data?.message));
     } else {
       return Promise.reject(requestError);
