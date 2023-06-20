@@ -10,6 +10,10 @@ import { ONESIGNAL_APP_ID } from './env';
 
 OneSignal.setAppId(ONESIGNAL_APP_ID);
 
+OneSignal.promptForPushNotificationsWithUserResponse((notification) => {
+  console.log('promptForPushNotificationsWithUserResponse', notification)
+});
+
 export default function App() {
   const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_700Bold });
 

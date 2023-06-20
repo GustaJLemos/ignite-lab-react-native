@@ -4,7 +4,9 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native'
 import { Box, useTheme } from 'native-base';
 import { AppRoutes } from './app.routes';
 import { AuthRoutes } from './auth.routes';
-import OneSignal from 'react-native-onesignal';
+import OneSignal, { NotificationReceivedEvent, OSNotification } from 'react-native-onesignal';
+import { useEffect, useState } from 'react';
+import { Notification } from '@components/Notification';
 
 // TODO quando usuário está logado, n posso usar deepLinking para as telas do usuários deslogado... e vice e versa.
 const linking = {
@@ -35,18 +37,19 @@ export function Routes() {
 
   const { user, isLoadingStorageData } = useAuth();
 
-  // TODO terminar essas funções, e criar componente de notificação
-  OneSignal.promptForPushNotificationsWithUserResponse((notification) => {
-    console.log('promptForPushNotificationsWithUserResponse', notification)
-  })
+  const [notification, setNotification] = useState<OSNotification>({} as OSNotification);
 
-  OneSignal.setNotificationWillShowInForegroundHandler((notification) => {
-    console.log('setNotificationWillShowInForegroundHandler', notification)
-  })
+  useEffect(() => {
+    const unsubscribe = OneSignal
+      .setNotificationWillShowInForegroundHandler((notificationReceivedEvent: NotificationReceivedEvent) => {
+        console.log('Recebendo a notificação em primeiro plano: ', notificationReceivedEvent);
+        const notificationReceived = notificationReceivedEvent.getNotification();
 
-  OneSignal.setNotificationOpenedHandler((notification) => {
-    console.log('setNotificationOpenedHandler', notification)
-  })
+        setNotification(notificationReceived);
+      })
+
+    return () => unsubscribe;
+  }, []);
 
   if (isLoadingStorageData) {
     return (
@@ -61,6 +64,12 @@ export function Routes() {
       <NavigationContainer theme={theme} linking={linking}>
         {user.id ? <AppRoutes /> : <AuthRoutes />}
       </NavigationContainer>
+      {notification?.title && (
+        <Notification
+          notification={notification}
+          onClose={() => setNotification({} as OSNotification)}
+        />
+      )}
     </Box>
   );
 }
